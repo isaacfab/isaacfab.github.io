@@ -1,0 +1,40 @@
+/* Main background */
+body {
+  font-family: 'Helvetica', 'Arial', sans-serif;
+  background-color: #ffffff;
+  color: #333333;
+}
+
+/* Headers */
+h1, h2, h3, h4, h5 {
+  color: #333333;
+}
+
+/* Links */
+a {
+  color: #007aff;
+  text-decoration: none;
+}
+
+/* Lists */
+ul, ol {
+  padding-left: 20px;
+}
+
+/* Code */
+code {
+  font-family: 'Courier New', Courier, monospace;
+  background-color: #f4f4f4;
+}
+
+/* Slide Layout */
+.slide {
+  padding: 50px;
+  text-align: center;
+}
+
+/* Footer */
+.footer {
+  font-size: 0.8em;
+  color: #999999;
+}

@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>WWCSO AI/ML Data Challenge</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Isaac Faber" />
+    <meta name="date" content="2023-09-21" />
+    <script src="libs/header-attrs-2.24/header-attrs.js"></script>
+    <link rel="stylesheet" href="scrollable.css" type="text/css" />
+    <link rel="stylesheet" href="mtheme_max.css" type="text/css" />
+    <link rel="stylesheet" href="fonts_mtheme_max.css" type="text/css" />
+    <link rel="stylesheet" href="custom.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# WWCSO AI/ML Data Challenge
+]
+.subtitle[
+## Case Study Presentation
+]
+.author[
+### Isaac Faber
+]
+.date[
+### 2023-09-21
+]
+
+---
+
+
+class: center, middle
+
+# Part 1 - Modeling Sales Data
+
+
+---
+
+# Part 1 Task Overview
+
+.pull-left[
+
+.font120[
+
+* Data Cleaning and Exploring
+
+* Holiday Effects
+
+* Supply and Demand Effects
+
+* Sales Prediction Modeling
+
+* Recommended Actions
+
+]
+]
+.pull-right[.center[&lt;img src="images/agenda.png" alt="family" width="300" style /&gt;]]
+
+---
+
+# The Data
+
+3 Datasets are used for this analysis. They have various amounts of complexity and preparation.
+
+1 Sales Data
+  * **~400k** observations 
+  * split between train and test (300k and ~100k obs respectively)
+  * weekly data ranging from `2010-02-05` to `2012-10-26`
+  * columns include **Store, Dept, Date, Weekly Sales, and Inventory**
+  * no missing or obviously corrupted data
+
+2 Stores
+  * **45** observations 
+  * columns include **Store, type, and size**
+  * no missing or obviously corrupted data
+  
+---
+
+# The Data
+
+3 Datasets are used for this analysis. They have various amounts of complexity and preparation.
+
+3 Features
+  * **8190** observations 
+  * weekly data ranging from `2010-02-05` to `013-07-26` 
+  * columns include **Store, Date, Temperature, Fuel Price, CPI, Unemployment, Holiday**
+  * Data also includes information on various promotions during holidays
+  * **This data is quite messy**
+
+---
+
+# Feature Data
+
+.pull-left[
+This dataset is quite important as it provides relevant information to weekly sales.
+
+* **Missing Data**
+  * CPI and Unemployment are missing **585** observations
+  * Promo 1 missing **4158**
+  * Promo 2 missing **5269**
+  * Promo 3 missing **4577**
+  * Promo 4 missing **4726**
+  * Promo 5 missing **4140**
+]
+
+
+.pull-right[
+.center[&lt;img src="images/missing.png" alt="family" width="300" style /&gt;
+]]
+
+---
+
+# Feature Data
+
+With CPI and Unemployment missing data I used the suggestion to get **external data**. 
+
+After cross checking there are small discrepancies with official government figures and those provided for the case study. 
+
+For example, on just the date `2010-02-05` case study provided CPI was recorded in ranges from **126** and **214** (with a std dev of ~38) When the government reported value was **220**&lt;sup&gt;1&lt;/sup&gt;
+
+To avoid ambiguity, I have chosen to replace both missing and provided data with official government data&lt;sup&gt;2&lt;/sup&gt;.
+
+.footnote[
+[1] [Consumer Price Index - All Urban Consumers]()
+
+[2] [Unemployment from BLS]()
+]
+
+---
+
+# Feature Data
+
+The case of missing data with *Promos* is tricky because the only data available is in the **future** relative to what we want to predict. 
+
+There are a number of ways to fill in (or ignore) missing data called **back casting**: 
+ 
+* Backward Fill 
+* Extrapolation
+* Seasonal Decomposition
+
+It is important to take data produced by this approach with a grain of salt. 
+
+However, in this case **seasonal decomposition** is the best approach based on the consistent nature of sales cycles.
+
+---
+
+# Feature Data
+
+Back Casting Promo Values
+
+.pull-left[.center[ Okay Model
+&lt;img src="images/tends-good.png" alt="family" width="500" style /&gt;
+]]
+
+.pull-right[.center[ Noisy Model
+&lt;img src="images/trends-bad.png" alt="family" width="500" style /&gt;
+]]
+
+* Model RMSE: **4791** is pulled up by several large outliers 
+* Back casting seems to reasonably capture seasonality
+
+---
+
+# Feature Data
+
+In addition to CPI and Unemployment data I have added the following **external data**
+
+* Consumer sentiment Index
+* S&amp;P 500 market price
+* VIX - volatility index
+* Unemployment by age and race
+
+---
+
+# Sales Data
+
+&lt;img src="images/sales-distribution.png" alt="family" width="850" style /&gt;
+
+---
+
+# Sales Data
+
+.center[&lt;img src="images/top5-sales.png" alt="family" width="1000" style /&gt;]
+
+---
+
+# Sales Data
+
+&lt;img src="images/dept-distribution.png" alt="family" width="850" style /&gt;
+
+---
+
+# Sales Data
+
+.center[&lt;img src="images/top6-dept.png" alt="family" height="400" style/&gt;]
+
+---
+
+# Holiday Effects
+
+While the total holiday effect is clear from the previous graphs we can also model it quantitatively. The following statistical results are the product of **multiple linear regression:**
+
+.center[&lt;img src="images/lm-promo.png" alt="family" height="400" style/&gt;]
+
+The p values &lt; .05 are of interest and indicate the present of an effect.
+
+---
+
+#Holdiay Effects
+
+.center[&lt;img src="images/lm-promo1.png" alt="family" height="400" style/&gt;]
+
+---
+
+# Supply and Demand Effects
+
+Similar to the Holiday anlsysis Supply and Demand are explored via the following statistical test using **multiple linear regression:**
+
+.center[&lt;img src="images/lm-sd.png" alt="family" height="400" style/&gt;]
+
+The p values &lt; .05 are of interest and indicate the present of an effect.
+
+---
+
+# Supply and Demand Effects
+
+.center[&lt;img src="images/lm-inventory.png" alt="family" height="400" style/&gt;]
+
+---
+
+class: center, middle
+
+# Sales Prediction Modeling
+
+---
+
+# Sales Predictions
+
+There are a few important considerations for this approach to modeling:
+
+.pull-left[
+
+* Using a weighted root mean squared error (RMSE) for evaluation
+* A number of ML prediction algorithms will be explored
+* Will be predicting **rates of change** and not actual sales
+]
+
+
+.pull-right[
+
+.center[&lt;img src="images/rate.png" alt="family" width="300" style /&gt;]
+
+]
+
+---
+
+# Sales Predictions
+
+&lt;img src="images/sales-lag.png" alt="family" height="500" style/&gt;
+
+One week to the next, Sales by Store have a correlation of: **0.96**
+
+
+---
+
+# Benchmarking
+
+Using the same technique as we did for replacing missing data a benchmark can be created;
+
+&lt;img src="images/season-pred.png" alt="family" height="400" style/&gt;
+
+With a standard Seasonal Decomposition model we get a RMSE: **5714** and a WRMSE of **5497**
+
+---
+
+# Machine Learning Approach
+
+To explore many different types of models the data needs to be prepared to avoid **leakage.** Some considerations are:
+
+.pull-left[
+* Only use data you 'know' when making a prediction - no time-of or future data
+* Manage the lag variables to capture enough but not too much data **(T-x)**
+* Based on the nature of this problem explore the following algorithms: **random forest, k-nearest neighbors, boosted trees**
+* Use weighted RMSE based on holiday's for error
+]
+
+
+
+.pull-right[
+.center[&lt;img src="images/robot.png" alt="family" width="300" style /&gt;]
+]
+
+
+
+```python
+def wmae(y_true, y_pred, holiday):
+    weights = np.where(holiday, 5, 1)
+    return np.sum(weights * np.abs(y_true - y_pred)) / np.sum(weights)
+```
+
+---
+
+# Machine Learning Features
+
+.pull-left[
+Revisiting the features now that everything is consolidated
+
+
+* Categorical Features: **Store, Dept, Type, day, week, month, holiday**
+* Numerical Features: **return lag, inventory, size, temperature, fuel price, CPI, Consumer Sentiment, VIX, AAPL, S&amp;P500, Unemployment (7 subsets)**
+
+
+ML models often perform better when variables are **normalized**, which I did using a distribution (*Z-Value*) approach. Categorical features are **encoded** using dummy variables (one hot encoding).]
+
+.pull-right[
+.center[&lt;img src="images/features.png" alt="family" width="300" style /&gt;]
+]
+
+---
+
+# Machine Learning Performance
+
+The performance of the three algorithms after fine tuning doing feature engineering and hypermarket exploration.
+
+.center[&lt;img src="images/metric-table1.png" alt="family" width="800" style /&gt;]
+
+---
+
+# Machine Learning Performance
+
+The performance of the three algorithms after fine tuning doing feature engineering and hypermarket exploration.
+
+.center[&lt;img src="images/metric-table2.png" alt="family" width="800" style /&gt;]
+
+---
+
+# kNN Model Performance
+
+&lt;img src="images/knn.png" alt="family" width="800" style /&gt;
+
+---
+
+# Tree Model Performance
+
+.pull-left[
+&lt;img src="images/gbt.png" alt="family" width="800" style /&gt;
+
+]
+
+.pull-right[
+&lt;img src="images/rf.png" alt="family" width="800" style /&gt;
+
+]
+
+---
+
+# Recommendations
+
+## 1. Explore via experimentation the trade-off between promotions and sales on non-holidays
+## 2. Holiday's provide their own demand so prioritizing inventory is best
+## 3. Sales modeling should be done via a set of smaller models that aggregate - incorporate more heuristics into modeling
+
+---
+
+class: center, middle
+
+# Part 2 - Research Plan: Bike+
+
+---
+
+# Research Plan Overview
+
+
+
+.pull-left[
+
+* The goal of this project is better understand demand to create **business value**
+* Specifically looking at new products and how **Demand Generating (DG) events**, like launches, impact demand
+* The Research Plan is above all be about **rapid experimentation and testing**
+]
+
+.pull-right[
+&lt;img src="images/researach.png" alt="family" width="500" style /&gt;
+
+]
+
+---
+
+# The Research Pardigm
+
+.center[&lt;img src="images/decision.png" alt="family" width="900" style /&gt;]
+
+
+---
+
+# Common Tools and Team
+
+.center[&lt;img src="images/tools.png" alt="family" width="900" style /&gt;]
+
+Settle quickly on a *common but flexible* technology stack that enables collaboration and rapid experimentation
+
+---
+
+# Data Engineering
+
+
+Need a robust collection of all relevant data. Made available for exploration and production purposes.
+
+.pull-left[
+
+#### Internal Data
+* Sales Hisotry
+* Customer Demographics
+* Past DG events
+* Telemetry 
+* Relevant video/audio
+
+#### External Data
+* Market Trends
+* Macro Economic Factors
+* Social Media Activity
+* Competitors Relevant Activity
+
+]
+
+.pull-right[
+
+&lt;img src="images/data-eng.png" alt="family" width="500" style /&gt;
+
+]
+
+---
+
+# Date Science
+
+Need a common collaborative data science environment for a team to decompose problems.
+
+.pull-left[
+
+#### Methodologies
+* Exploratory Data Analysis 
+* Feature Engineering
+* Model Selection
+* Testing and Validation 
+
+#### Specific Focuses
+* Robust statistical hypothesis testing for DG impact
+* Running a set of Naive models for benchmarks
+* Predicting Demand using a suite of supervised ML algorithms
+* Recommend DG focus points, promotions, and inventory levels
+
+]
+
+.pull-right[
+
+&lt;img src="images/ai.png" alt="family" width="500" style /&gt;
+]
+
+---
+
+# Date Science - Test and Evaluation
+
+The standard for how algorithms should be evaluated will drive rapid iteration and quality.
+
+.pull-left[
+
+#### Methodology
+* Use techniques from **Decision Analysis (DA)** for modeling choices and uncertainties (like how much inventory per store)
+* ML models will be designed around the uncertainly in these DA models
+* The primary metric of concern will be maximizing **risk adjusted expected business value**
+* Any technique to improve this metric is acceptable
+
+
+]
+
+.pull-right[
+
+&lt;img src="images/ai.png" alt="family" width="500" style /&gt;
+]
+
+---
+
+# Software Engineering
+
+.pull-left[
+
+#### Sharing Insights
+* Have a approaches to share research outcomes via UI or API
+* Presentation approaches should be scaleable as needed but not at the expense of experimentation
+* Should be easily tied into other organizational software engineering efforts
+]
+
+.pull-right[
+
+&lt;img src="images/se.png" alt="family" width="500" style /&gt;
+]
+
+
+---
+
+# Conclusion &amp; Recommendations
+
+### 1. Create the infrastructure for rapid experimentation and deployment.
+
+### 2. Develop and approve testing and evaluation metrics starting with risk adjusted business value (from a DA model).
+
+### 3. Make experimentation results easily consumable by the rest of the organization.
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": true
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
