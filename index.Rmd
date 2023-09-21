@@ -21,6 +21,13 @@ class: center, middle
 
 ---
 
+class: center, middle
+
+# Slides: [isaacfab.github.io](https://isaacfab.github.io)
+
+
+---
+
 # Part 1 Task Overview
 
 .pull-left[
@@ -67,7 +74,7 @@ class: center, middle
 
 3 Features
   * **8190** observations 
-  * weekly data ranging from `2010-02-05` to `013-07-26` 
+  * weekly data ranging from `2010-02-05` to `2013-07-26` 
   * columns include **Store, Date, Temperature, Fuel Price, CPI, Unemployment, Holiday**
   * Data also includes information on various promotions during holidays
   * **This data is quite messy**
@@ -106,9 +113,9 @@ For example, on just the date `2010-02-05` case study provided CPI was recorded 
 To avoid ambiguity, I have chosen to replace both missing and provided data with official government data<sup>2</sup>.
 
 .footnote[
-[1] [Consumer Price Index - All Urban Consumers]()
+[1] [Consumer Price Index - All Urban Consumers](http://www.sca.isr.umich.edu/)
 
-[2] [Unemployment from BLS]()
+[2] [Unemployment from BLS](https://www.bls.gov/charts/employment-situation/civilian-unemployment-rate.htm)
 ]
 
 ---
@@ -150,7 +157,7 @@ Back Casting Promo Values
 
 In addition to CPI and Unemployment data I have added the following **external data**
 
-* Consumer sentiment Index
+* Consumer Sentiment Index
 * S&P 500 market price
 * VIX - volatility index
 * Unemployment by age and race
@@ -254,7 +261,7 @@ Using the same technique as we did for replacing missing data a benchmark can be
 
 <img src="images/season-pred.png" alt="family" height="400" style/>
 
-With a standard Seasonal Decomposition model we get a RMSE: **5714** and a WRMSE of **5497**
+With a standard Seasonal Decomposition model we get a RMSE: **5714** and a WRMSE of **5497**. For context, the Standard Deviation of Weekly Sales is ~22,000.
 
 ---
 
@@ -304,17 +311,21 @@ ML models often perform better when variables are **normalized**, which I did us
 
 # Machine Learning Performance
 
-The performance of the three algorithms after fine tuning doing feature engineering and hypermarket exploration.
+The performance of the best type of three algorithms after *feature engineering* and *hyper parameter exploration.*
 
 .center[<img src="images/metric-table1.png" alt="family" width="800" style />]
+
+Over 40 different ML model variations where tested.
 
 ---
 
 # Machine Learning Performance
 
-The performance of the three algorithms after fine tuning doing feature engineering and hypermarket exploration.
+The performance of the best type of three algorithms after *feature engineering* and *hyper parameter exploration.*
 
 .center[<img src="images/metric-table2.png" alt="family" width="800" style />]
+
+Over 40 different ML model variations where tested.
 
 ---
 
@@ -338,9 +349,15 @@ The performance of the three algorithms after fine tuning doing feature engineer
 
 ---
 
+# Feature Importance
+
+.center[<img src="images/fi.png" alt="family" width="750" style />]
+
+---
+
 # Recommendations
 
-## 1. Explore via experimentation the trade-off between promotions and sales on non-holidays
+## 1. Explore,via experimentation, the trade-off between promotions and sales on non-holidays
 ## 2. Holiday's provide their own demand so prioritizing inventory is best
 ## 3. Sales modeling should be done via a set of smaller models that aggregate - incorporate more heuristics into modeling
 
@@ -450,7 +467,7 @@ The standard for how algorithms should be evaluated will drive rapid iteration a
 
 #### Methodology
 * Use techniques from **Decision Analysis (DA)** for modeling choices and uncertainties (like how much inventory per store)
-* ML models will be designed around the uncertainly in these DA models
+* ML models will be designed around the uncertainly in these DA models and prioritized based on the **Value of Data**
 * The primary metric of concern will be maximizing **risk adjusted expected business value**
 * Any technique to improve this metric is acceptable
 
